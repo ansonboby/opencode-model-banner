@@ -7,23 +7,27 @@ Per-model ASCII art banners for [opencode](https://opencode.ai) — the TUI codi
 Replaces the default opencode wordmark with your **current model's mascot**, rendered as
 smooth gradient half-block art:
 
-```
-▄▄▄▄▄▄▄▄▄▄▄▄██
-█████████████████████████
-████████████████████████▄▄▄▀███
-██████████████████████████████▄▄▄▀
-███████████████████████████████████▄▄▄▄
-▀▀█████████████████████████▄▄▄▀▀▀▀█████████
-   ...
+   ▄▄████████▄▄▄                                                  ▄▄▄████████▄
+ ▄███████████████▄▄                                            ▄██████████████
+ ███████████████████▄  ▄▄▄▄▄▄█████████████▄▄▄▄▄▄▄▄          ▄█████████████████
+ ██████████████████████████████████████████████████████▄▄▄██████████████████▀
+ ▀████████████████████████████████████████████████████████▀▀▀▀▀██████████▀▀
+   ▀▀█████████████████████████████████████████████████████         ▀▀▀▀
+       ▀▀██████████████████████████████████████████████████▄▄
+           ▀▀▀███████████████████████████████████████▀▀▀  █████▄
+                  ▀▀▀▀▀▀████████████████████▀▀▀▀▀         ██████▄
+                                                          ███████▄
+                                                           ███████
+                                                            ▀████▀
 DeepSeek V4 Flash (tokenrouter)
-```
 
 - **Home screen** — large brand mascot with a vertical color gradient + model name
 - **Session view** — compact one-line banner above the prompt (`◈ GLM 5.3 Free`)
 - **Live switching** — banner swaps within ~0.5s of a ctrl+x m model switch
 - Works in the terminal **and** the opencode desktop app (both run the same TUI)
 
-Art for 15 brands, generated from official logos ([lobe-icons](https://github.com/lobehub/lobe-icons), MIT):
+Art for 15 brands — 14 generated from official logos ([lobe-icons](https://github.com/lobehub/lobe-icons),
+MIT) plus a hand-authored DeepSeek whale:
 DeepSeek · Z.ai (GLM) · Kimi (Moonshot) · Grok (xAI) · Qwen · MiniMax · OpenAI ·
 Gemini · Claude · Mistral · NVIDIA · StepFun · Tencent · ByteDance · opencode.
 Unknown models fall back to block-letter art of the model name.
@@ -86,7 +90,10 @@ FIGlet-style name art.
 
 ## Regenerating art
 
-Art is not hand-drawn. `plugin/art.ts` is machine-generated from official SVGs:
+Art is machine-generated. `plugin/art.ts` comes from SVG sources — official
+logos from [lobe-icons](https://github.com/lobehub/lobe-icons) for 14 brands,
+and a hand-authored stylized whale (rounded head, arched back, two-fluke tail)
+for DeepSeek:
 
 ```sh
 cd gen && bun install        # resvg for SVG rasterization
