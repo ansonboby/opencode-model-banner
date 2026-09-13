@@ -1,0 +1,23 @@
+name: ci
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install test deps
+        working-directory: plugin
+        run: bun install
+      - name: Bundle sync (art.ts inlined into model-banner.tsx)
+        run: python3 bundle.py --check
+      - name: Plugin builds
+        working-directory: plugin
+        run: bun build model-banner.tsx --target=bun --external "@opentui/*" --outfile=/dev/null
+      - name: Art registry behavior tests
+        working-directory: plugin
+        run: bun test

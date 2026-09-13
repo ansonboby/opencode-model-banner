@@ -1,5 +1,7 @@
 # opencode-model-banner
 
+[![CI](https://github.com/ansonboby/opencode-model-banner/actions/workflows/ci.yml/badge.svg)](https://github.com/ansonboby/opencode-model-banner/actions/workflows/ci.yml) [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Per-model ASCII art banners for [opencode](https://opencode.ai) — the TUI coding agent.
 
 Replaces the default opencode wordmark with your **current model's mascot**, rendered as
@@ -25,6 +27,30 @@ Art for 15 brands, generated from official logos ([lobe-icons](https://github.co
 DeepSeek · Z.ai (GLM) · Kimi (Moonshot) · Grok (xAI) · Qwen · MiniMax · OpenAI ·
 Gemini · Claude · Mistral · NVIDIA · StepFun · Tencent · ByteDance · opencode.
 Unknown models fall back to block-letter art of the model name.
+
+## Example
+
+DeepSeek whale on the home screen (truecolor terminal):
+
+```
+        ▄▄▄▄▄▄▄▄▄▄▄▄██
+   █████████████████████████
+  ████████████████████████▄▄▄▀███
+  ███████████████████████████████▄▄▄▀
+ ████████████████████████████████████▄▄▄▄
+ ▀▀████████████████████████▄▄▄▀▀▀▀█████████
+    ▀▀▀██████████████▄▄███▀▀█████
+    ▀▀████████████████▄▄▄▄▄▄█████
+      ▀▀███████████████████████
+     ▄▄▄▄▄▄▄▀▀███████████████████
+     ▄██████████▄▄▄▄▀▀▀█████████████
+████████████████████████████▄█▀▀▀▀▀▀▀▀▀▀▀▀
+     ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+
+        DeepSeek V4 Flash (tokenrouter)
+```
+
+In sessions, a compact one-line banner above the prompt: `☾ Kimi K2.5`, `◈ GLM 5.3 Free`, `✦ Grok 4.1 Fast`.
 
 ## Install
 
@@ -94,6 +120,8 @@ plugin/model-banner.tsx   single-file plugin (install this)
 plugin/art.ts             art registry (source of truth, bundled into the above)
 plugin/package.json       type-check deps only — not needed at runtime
 bundle.py                 inline art.ts into model-banner.tsx (use --check in CI)
+plugin/art.test.ts        matchArt behavior tests (bun test)
+.github/workflows/ci.yml  bundle sync + build + tests
 gen/svg2art.mjs           SVG → gradient half-block converter
 gen/emit.py               converter output → art.ts
 gen/icons/                official brand SVGs (from lobehub/lobe-icons, MIT)
