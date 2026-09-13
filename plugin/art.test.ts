@@ -25,7 +25,7 @@ describe("matchArt", () => {
       expect(entry.color).toBe(wantColor)
       // generated art must carry runs + palette
       expect(entry.runs!.length).toBeGreaterThan(4)
-      expect(entry.colors!.length).toBe(12)
+      expect(entry.colors!.length).toBe(16)
       for (const run of entry.runs!) {
         for (const [idx] of run) expect(idx).toBeLessThan(entry.colors!.length)
       }

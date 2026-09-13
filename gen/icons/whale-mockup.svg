@@ -1,5 +1,5 @@
 <svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
-  <!-- body: head dome left, arched back, belly, tapering to stock -->
+  <!-- body: deep blue base tone (renders as shadow tone) -->
   <path fill="#4D6BFE" d="
     M 58 160
     C 20 150, 0 122, 8 92
@@ -11,6 +11,19 @@
     C 462 200, 366 218, 276 212
     C 198 207, 128 194, 94 178
     C 68 164, 60 164, 58 160
+    Z
+  "/>
+  <!-- light face + belly highlight (mockup highlight tone) -->
+  <path fill="#fff" d="
+    M 14 108
+    C 18 130, 34 150, 60 156
+    C 90 165, 120 172, 160 178
+    C 240 192, 340 196, 430 186
+    C 462 180, 484 172, 500 162
+    C 502 150, 500 142, 494 136
+    C 440 128, 360 122, 280 118
+    C 240 116, 210 112, 190 108
+    C 130 98, 60 96, 14 108
     Z
   "/>
   <!-- top fluke -->
@@ -31,4 +44,6 @@
     C 526 216, 514 186, 504 164
     Z
   "/>
+  <!-- eye -->
+  <circle cx="82" cy="120" r="11" fill="#000"/>
 </svg>

@@ -36,25 +36,49 @@ const lerp = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t)
 const toHex = c => '#' + c.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('')
 
 function normalize(svg, color, stretchX = 1) {
-  svg = svg.replace(/ fill="[^"]*"/g, '').replace(/ stroke="[^"]*"/g, '').replace(/ style="[^"]*"/g, '')
-  svg = svg.replace('<svg', `<svg fill="${color}"`)
+  // Preserve author fill tones: any path whose fill is NOT one of the three
+  // reserved tone anchors (#fff white hi, #000 black sh) keeps its fill —
+  // classified hi/base/sh by luminance vs the brand color. Reserved anchors
+  // map to hi/sh explicitly. Everything else (no fill, currentColor, url())
+  // becomes base = brand color.
+  const brand = hexToRgb(color)
+  const tones = new Map() // per-fill resolved tone id
+  const brandFill = `#${toHex(brand).slice(1)}`
+  // strip any fill on the <svg> root itself (resvg rejects duplicate attrs);
+  // path-level fills are preserved for tone classification
+  svg = svg.replace(/<svg\s+fill="[^"]*"/, '<svg')
+  svg = svg.replace(/<svg(\s)/, `<svg fill="${brandFill}"$1`)
   if (stretchX !== 1) {
-    // scale content horizontally around center: wrap all children in <g>
     const open = svg.indexOf('>') + 1
     const close = svg.lastIndexOf('</svg>')
     const head = svg.slice(0, open)
     const body = svg.slice(open, close)
-    // scale around viewBox center so content stays in frame
     const m = svg.match(/viewBox="([\d.+-]+)[\s,]+([\d.+-]+)[\s,]+([\d.+-]+)[\s,]+([\d.+-]+)"/)
     const cx = m ? (Number(m[1]) + Number(m[3]) / 2) : 12
     svg = `${head}<g transform="translate(${cx},0) scale(${stretchX},1) translate(${-cx},0)">${body}</g></svg>`
   }
-  return svg
+  return { svg, tones, brandFill }
 }
+
+function classify(fill, brandLum) {
+  if (!fill) return 'base'
+  const f = fill.toLowerCase()
+  if (f === '#fff' || f === '#ffffff' || f === 'white') return 'hi'
+  if (f === '#000' || f === '#000000' || f === 'black') return 'sh'
+  if (f === 'currentcolor' || f.startsWith('url(')) return 'base'
+  try {
+    const lum = rgbLum(hexToRgb(f.startsWith('#') ? f : color))
+  } catch { return 'base' }
+  if (lum > brandLum + 0.18) return 'hi'
+  if (lum < brandLum - 0.18) return 'sh'
+  return 'base'
+}
+
+function rgbLum([r, g, b]) { return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 }
 
 function convert(svgFile, key, targetRows) {
   const [top, bot] = GRADIENTS[key]
-  const svg = normalize(readFileSync(svgFile, 'utf8'), top, STRETCH[key] ?? 1)
+  const { svg } = normalize(readFileSync(svgFile, 'utf8'), top, STRETCH[key] ?? 1)
   const SS = 8
   const CELL_W = 8 * SS   // 64 px per glyph cell horizontally
   const CELL_H = 16 * SS  // 128 px per glyph cell vertically
@@ -65,8 +89,52 @@ function convert(svgFile, key, targetRows) {
   const rows = targetRows
   // terminal glyph cell is ~1:2 (w:h); preserve the SVG's visual aspect
   const cols = Math.max(2, Math.round((w / h) * rows * 2 * (STRETCH[key] ?? 1)))
-  // natural alpha grid: colsN x rows*2 sub-cells
-  const colsN = Math.max(1, Math.ceil(w / (CELL_W)))
+  const colsN = Math.max(1, Math.ceil(w / CELL_W))
+
+  // Per-render classify: sample the rendered fill color of every ink pixel
+  // to recover author tones (resvg preserves fills). A cell's tone = the
+  // most common ink-pixel color class in its area.
+  const inkAt = (x, y) => {
+    const a = px[(y * w + x) * 4 + 3]
+    if (a < 128) return null
+    const r0 = px[(y * w + x) * 4], g0 = px[(y * w + x) * 4 + 1], b0 = px[(y * w + x) * 4 + 2]
+    return [r0, g0, b0]
+  }
+  // brand luminance for tone classification
+  const brandLum = rgbLum(hexToRgb(top))
+
+  function covPx(gx, gy, sub) {
+    // returns { cov, tone } — coverage fraction + dominant tone letter
+    const y0 = gy * CELL_H + sub * CELL_H / 2
+    let ink = 0, n = 0
+    const toneCount = { hi: 0, base: 0, sh: 0 }
+    for (let y = y0; y < y0 + CELL_H / 2; y += SS) {
+      if (y >= h) continue
+      const yi = Math.floor(y)
+      for (let x = gx * CELL_W; x < (gx + 1) * CELL_W; x += SS) {
+        if (x >= w) continue
+        const xi = Math.floor(x)
+        n++
+        const c = inkAt(xi, yi)
+        if (!c) continue
+        ink++
+        const lum = rgbLum(c)
+        const sat = Math.max(...c) - Math.min(...c)
+        // white fill → hi, black fill → sh; otherwise luminance vs brand
+        let tone = 'base'
+        if (lum > 0.93 && sat < 25) tone = 'hi'
+        else if (lum < 0.1) tone = 'sh'
+        else if (lum > brandLum + 0.18) tone = 'hi'
+        else if (lum < brandLum - 0.18) tone = 'sh'
+        toneCount[tone]++
+      }
+    }
+    const tone = ink === 0 ? 'base' :
+      (toneCount.hi >= ink * 0.55 ? 'hi' : toneCount.sh >= ink * 0.55 ? 'sh' : 'base')
+    return n ? { cov: ink / n, tone } : { cov: 0, tone: 'base' }
+  }
+
+  // natural grid (colsN wide) with tone per half-cell
   const grid = []
   for (let gy = 0; gy < rows; gy++) {
     const rowT = [], rowB = []
@@ -76,7 +144,8 @@ function convert(svgFile, key, targetRows) {
     }
     grid.push([rowT, rowB])
   }
-  // vertical scale ok (fitTo height matches rows). horizontal bilinear to cols:
+
+  // horizontal bilinear resize to cols (coverage linear, tone nearest)
   const covGrid = []
   for (let gy = 0; gy < rows; gy++) {
     const topR = [], botR = []
@@ -86,44 +155,84 @@ function convert(svgFile, key, targetRows) {
       const i1 = Math.max(0, Math.min(colsN - 1, i0 + 1))
       const fx = Math.max(0, Math.min(1, sx - i0))
       for (const [srcRow, dst] of [[grid[gy][0], topR], [grid[gy][1], botR]]) {
-        dst.push(srcRow[i0] * (1 - fx) + srcRow[i1] * fx)
+        const cov = srcRow[i0].cov * (1 - fx) + srcRow[i1].cov * fx
+        const tone = fx < 0.5 ? srcRow[i0].tone : srcRow[i1].tone
+        dst.push({ cov, tone })
       }
     }
     covGrid.push([topR, botR])
   }
-  function covPx(gx, gy, sub) {
-    const y0 = gy * CELL_H + sub * CELL_H / 2
-    let tot = 0, n = 0
-    for (let y = y0; y < y0 + CELL_H / 2; y += SS) {
-      if (y >= h) continue
-      for (let x = gx * CELL_W; x < (gx + 1) * CELL_W; x += SS) {
-        if (x >= w) continue
-        tot += px[(y * w + x) * 4 + 3] > 128 ? 1 : 0
-        n++
-      }
+
+  // ---------- palette: 16 steps + aura ----------
+  const PALETTE16 = 16
+  const colors = Array.from({ length: PALETTE16 }, (_, i) =>
+    toHex(lerp(hexToRgb(top), hexToRgb(bot), i / (PALETTE16 - 1))))
+
+  // diagonal light: light comes from upper-left; brightness rises toward
+  // upper-left corner of the ink bbox, falls toward lower-right
+  let minX = cols, maxX = -1, minY = rows, maxY = -1
+  for (let gy = 0; gy < rows; gy++)
+    for (let gx = 0; gx < cols; gx++) {
+      const { cov } = covGrid[gy][0][gx]
+      if (cov > 0.5) { if (gx < minX) minX = gx; if (gx > maxX) maxX = gx; if (gy < minY) minY = gy; if (gy > maxY) maxY = gy }
     }
-    return n ? tot / n : 0
+  const diag = (gx, gy) => {
+    if (maxX < minX) return 0.5
+    const nx = (gx - minX) / Math.max(1, maxX - minX)          // 0 left → 1 right
+    const ny = (gy - minY) / Math.max(1, maxY - minY)          // 0 top → 1 bottom
+    return 1 - (nx + ny) / 2                                    // 1 at upper-left → 0 at lower-right
   }
 
-  const colors = Array.from({ length: PALETTE }, (_, i) => toHex(lerp(hexToRgb(top), hexToRgb(bot), i / (PALETTE - 1))))
+  // neighbors of an (gx, gy) half-cell (4-neighborhood)
+  const ink = (gx, gy, sub) => {
+    if (gy < 0 || gy >= rows || gx < 0 || gx >= cols) return 0
+    return covGrid[gy][sub][gx].cov
+  }
 
   const runs = []
   for (let gy = 0; gy < rows; gy++) {
     const segs = []
     for (let gx = 0; gx < cols; gx++) {
       const cT = covGrid[gy][0][gx], cB = covGrid[gy][1][gx]
-      const onT = cT > 0.5, onB = cB > 0.5
+      const onT = cT.cov > 0.5, onB = cB.cov > 0.5
       if (!onT && !onB) {
-        // blank cell: emit a space run so internal gaps (Z cutouts, fluke
-        // notches, ring holes) survive run-length compression and keep ink
-        // at its true column offset
-        segs.push([-1, ' '])
+        // soft aura: ink adjacent (within 1 cell) but this cell empty →
+        // sparse ▒ dither in a palette color, else plain blank
+        const near = Math.max(
+          ink(gx - 1, gy, 0), ink(gx + 1, gy, 0),
+          ink(gx - 1, gy, 1), ink(gx + 1, gy, 1),
+          ink(gx, gy - 1, 0), ink(gx, gy + 1, 0),
+        )
+        if (near > 0.5) {
+          // gentle: aura only in the darker half of the palette (below top)
+          const t = rows <= 1 ? 0.5 : gy / (rows - 1)
+          const aidx = Math.min(PALETTE16 - 1, Math.round(t * (PALETTE16 - 1) * 0.6 + PALETTE16 * 0.25))
+          segs.push([aidx, '▒'])
+        } else {
+          segs.push([-1, ' '])
+        }
         continue
       }
+      // vertical gradient position 0..1 within art
       const t = rows <= 1 ? 0 : gy / (rows - 1)
-      let idx = Math.round(t * (PALETTE - 1))
-      const edge = onT && onB ? Math.min(cT, cB) : Math.max(cT, cB)
-      if (edge < 0.85) idx = Math.min(PALETTE - 1, idx + 1)
+      // base idx from vertical gradient (like before)
+      let idx = Math.round(t * (PALETTE16 - 1))
+      // diagonal light bias: brighten toward upper-left, darken toward
+      // lower-right — but keep the vertical gradient as the anchor tone
+      const d = diag(gx, gy)
+      idx = Math.round(idx + (d - 0.5) * 8)
+      idx = Math.max(0, Math.min(PALETTE16 - 1, idx))
+      // author tone: hi lifts toward top of palette, sh drops toward bottom
+      const tone = onT && onB ? (cT.tone === cB.tone ? cT.tone : 'base') : (onT ? cT.tone : cB.tone)
+      if (tone === 'hi') idx = Math.max(0, idx - 5)
+      else if (tone === 'sh') idx = Math.min(PALETTE16 - 1, idx + 5)
+      // rim: edge cell (partial coverage) — upper-left edges get a bright rim,
+      // lower-right edges get a dark rim (light direction consistent)
+      const edge = onT && onB ? Math.min(cT.cov, cB.cov) : Math.max(cT.cov, cB.cov)
+      if (edge < 0.85) {
+        if (d > 0.55) idx = Math.max(0, idx - 3)   // lit rim
+        else idx = Math.min(PALETTE16 - 1, idx + 2) // shade rim
+      }
       segs.push([idx, GLYPH[`${onT ? 1 : 0}${onB ? 1 : 0}`]])
     }
     const merged = []

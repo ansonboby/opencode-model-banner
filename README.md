@@ -26,8 +26,10 @@ DeepSeek V4 Flash (tokenrouter)
 - **Live switching** — banner swaps within ~0.5s of a ctrl+x m model switch
 - Works in the terminal **and** the opencode desktop app (both run the same TUI)
 
-Art for 15 brands — 14 hand-authored brand mascots (wide banner silhouettes,
-rendered as smooth gradient half-blocks) plus the stock opencode mark:
+Art for 15 brands — 14 hand-authored brand mascots (wide banner silhouettes)
+plus the stock opencode mark, each rendered as *illustrated* half-block art:
+layered tones (light face / dark back), diagonal lighting from the upper-left,
+rim highlights, and a soft sparse aura:
 DeepSeek 🐋whale · Z.ai Z · Kimi ☾crescent · Grok swept-wing · Qwen three rings ·
 MiniMax M · OpenAI hex-knot · Gemini sparkle · Claude sunburst · Mistral pixel-M ·
 NVIDIA eye · StepFun chevrons · Tencent penguin · ByteDance Doubao heart · opencode.
@@ -111,12 +113,16 @@ add a gradient pair + row budget in `gen/svg2art.mjs`, and a mapping entry in
 
 ### How the art is made
 
-Each SVG is rendered at 8× supersampling with resvg, normalized to a solid
-silhouette in the brand's top gradient color. Coverage of each half-block
-sub-cell becomes `█ ▀ ▄` glyphs (2× vertical resolution); a 12-step vertical
-gradient palette colors each run, and edge cells darken one step for
-anti-aliasing. Output is run-length-encoded `[paletteIdx, text]` segments so
-the plugin ships one `.tsx` with zero binary assets.
+Each SVG is rendered at 8× supersampling with resvg, preserving authored
+fill tones (white = highlight, black = shadow, brand hues = base). Coverage
+of each half-block sub-cell becomes `█ ▀ ▄` glyphs (2× vertical resolution).
+Coloring: a 16-step vertical gradient anchors the base tone, a diagonal
+light term brightens cells toward the upper-left of the ink and darkens the
+lower-right, authored tones shift cells 5 steps toward highlight/shadow,
+lit edges get a −3 rim highlight and shaded edges a +2 rim, and cells
+adjacent to ink but empty emit a sparse `▒` aura. Output is run-length
+encoded `[paletteIdx, text]` segments so the plugin ships one `.tsx` with
+zero binary assets.
 
 ## Repo layout
 
