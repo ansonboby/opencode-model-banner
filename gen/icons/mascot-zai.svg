@@ -1,0 +1,10 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- zai (Z.ai / GLM): deconstructed angular Z — three italic-sheared facets, joint gaps -->
+  <!-- facets are parallelograms; free ends sheared 72u down-left over 86u (logo's slant) -->
+  <!-- top bar: full-width band, both ends cut on the italic slant -->
+  <path fill="#7DE8FA" d="M 112 18 L 690 18 L 618 104 L 40 104 Z"/>
+  <!-- diagonal facet: sheared band, 270u horizontal (~77u perpendicular), 14u gaps at joints -->
+  <path fill="#7DE8FA" d="M 301 118 L 571 118 L 357 182 L 87 182 Z"/>
+  <!-- bottom bar: full-width band, right end on the italic slant, left end picks up diagonal tip -->
+  <path fill="#7DE8FA" d="M 112 196 L 690 196 L 618 282 L 40 282 Z"/>
+</svg>

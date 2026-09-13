@@ -142,38 +142,40 @@ function convert(svgFile, key, targetRows) {
 }
 
 // brand -> [svg, glyph row budget]
+// mascot SVGs are authored at banner aspect (730x300) — no stretch needed
 const STRETCH = {
-  deepseek: 1.0,   // hand-authored mockup whale already wide
-  zai: 1.4,
-  kimi: 1.3,
-  grok: 1.5,
-  qwen: 1.4,
-  minimax: 2.0,
-  gemini: 1.2,
-  claude: 1.2,
-  mistral: 1.4,
-  nvidia: 1.3,
-  openai: 1.3,
-  stepfun: 1.4,
-  tencent: 1.2,
-  bytedance: 1.4,
+  deepseek: 1.0,
+  zai: 1.0,
+  kimi: 1.0,
+  grok: 1.0,
+  qwen: 1.0,
+  minimax: 1.0,
+  gemini: 1.0,
+  claude: 1.0,
+  mistral: 1.0,
+  nvidia: 1.0,
+  openai: 1.0,
+  stepfun: 1.0,
+  tencent: 1.0,
+  bytedance: 1.0,
 }
 
 const FILES = {
+  // hand-authored mascots (730x300 banner aspect, ink fills ~90% height)
   deepseek: ['icons/whale-mockup.svg', 17],
-  zai: ['icons/zai.svg', 16],
-  kimi: ['icons/kimi.svg', 16],
-  grok: ['icons/grok.svg', 16],
-  qwen: ['icons/qwen.svg', 16],
-  minimax: ['icons/minimax.svg', 16],
-  openai: ['icons/openai.svg', 16],
-  gemini: ['icons/gemini.svg', 16],
-  claude: ['icons/claude.svg', 16],
-  mistral: ['icons/mistral.svg', 16],
-  nvidia: ['icons/nvidia.svg', 16],
-  stepfun: ['icons/stepfun.svg', 16],
-  tencent: ['icons/tencent.svg', 16],
-  bytedance: ['icons/bytedance.svg', 16],
+  zai: ['icons/mascot-zai.svg', 17],
+  kimi: ['icons/mascot-kimi.svg', 17],
+  grok: ['icons/mascot-grok.svg', 17],
+  qwen: ['icons/mascot-qwen.svg', 17],
+  minimax: ['icons/mascot-minimax.svg', 17],
+  openai: ['icons/mascot-openai.svg', 17],
+  gemini: ['icons/mascot-gemini.svg', 17],
+  claude: ['icons/mascot-claude.svg', 17],
+  mistral: ['icons/mascot-mistral.svg', 17],
+  nvidia: ['icons/mascot-nvidia.svg', 17],
+  stepfun: ['icons/mascot-stepfun.svg', 17],
+  tencent: ['icons/mascot-tencent.svg', 17],
+  bytedance: ['icons/mascot-bytedance.svg', 17],
   opencode: ['icons/opencode.svg', 16],
 }
 

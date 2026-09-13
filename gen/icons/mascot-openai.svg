@@ -1,0 +1,8 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- openai hexagonal knot: three fat interlocking arms form a stretched
+       hexagon rosette; wide corner wedges (TL, TR, bottom-center) and a
+       pinched trefoil void read as the braided blossom at banner scale -->
+  <path fill="#5BE3C4" d="M 260 12 L 470 12 L 485 100 C 440 80 400 113 365 128 C 330 113 290 80 245 100 Z"/>
+  <path fill="#5BE3C4" d="M 154 50.5 L 35 150 L 200 288 L 278 288 L 365 205 C 352 185 333 135 245 100 Z"/>
+  <path fill="#5BE3C4" d="M 576 50.5 L 695 150 L 530 288 L 452 288 L 365 205 C 378 185 397 135 485 100 Z"/>
+</svg>

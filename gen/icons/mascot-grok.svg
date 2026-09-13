@@ -1,0 +1,10 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- grok: swept-wing mark - three thick parallel slashes stepping up
+       from the bottom-left root to the top-right wingtip -->
+  <!-- leading stroke: longest, rises to the top-right wingtip -->
+  <path fill="#F2F4F7" d="M 56 100.1 L 715 14.5 L 715 80.5 L 56 166.1 Z"/>
+  <!-- second stroke: mid tier -->
+  <path fill="#F2F4F7" d="M 37 199.7 L 623 127.5 L 623 193.5 L 37 265.7 Z"/>
+  <!-- root stroke: grounded in the bottom-left corner -->
+  <path fill="#F2F4F7" d="M 13 291.7 L 483 232 L 483 298 L 13 357.7 Z"/>
+</svg>

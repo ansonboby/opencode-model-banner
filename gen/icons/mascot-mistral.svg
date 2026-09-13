@@ -1,0 +1,17 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mistral pixel-M banner: the official 7x5 block mark, scaled to fill the frame.
+       Columns x 15+100c (c=0..6), rows y 8+57r (r=0..4).
+       Pattern: .#...#. / .##.##. / .#####. / .#.#.#. / ###.### -->
+  <path fill="#FF9455" d="
+    M 115 8 H 215 V 65 H 115 Z
+    M 515 8 H 615 V 65 H 515 Z
+    M 115 65 H 315 V 122 H 115 Z
+    M 415 65 H 615 V 122 H 415 Z
+    M 115 122 H 615 V 179 H 115 Z
+    M 115 179 H 215 V 236 H 115 Z
+    M 315 179 H 415 V 236 H 315 Z
+    M 515 179 H 615 V 236 H 515 Z
+    M 15 236 H 315 V 293 H 15 Z
+    M 415 236 H 715 V 293 H 415 Z
+  "/>
+</svg>

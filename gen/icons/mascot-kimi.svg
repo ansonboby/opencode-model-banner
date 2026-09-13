@@ -1,0 +1,18 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- kimi (moonshot): thick crescent moon, horns pointing right -->
+  <!-- outer disc r=140 center (170,150); inner cut r=110 center (230,150) -> 100u thick limb -->
+  <path fill="#FFE1A0" d="
+    M 262.5 44.9
+    C 236.93 22.39, 204.06 10, 170 10
+    C 92.68 10, 30 72.68, 30 150
+    C 30 227.32, 92.68 290, 170 290
+    C 204.06 290, 236.93 277.61, 262.5 255.1
+    C 251.96 258.36, 241.03 260, 230 260
+    C 169.25 260, 120 210.75, 120 150
+    C 120 89.25, 169.25 40, 230 40
+    C 241.03 40, 251.96 41.64, 262.5 44.9
+    Z
+  "/>
+  <!-- companion 4-point star in the upper right -->
+  <path fill="#FFE1A0" d="M 620 10 L 646 64 L 700 90 L 646 116 L 620 170 L 594 116 L 540 90 L 594 64 Z"/>
+</svg>

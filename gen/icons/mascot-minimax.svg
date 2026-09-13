@@ -1,0 +1,6 @@
+<svg viewBox="0 0 730 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- MiniMax mascot: bold crown-M — two thick diagonal peaks, deep center vertex, wide base bar -->
+  <path fill="#FC8CAC" d="M 25 293 L 195 6 L 365 208 L 535 6 L 705 293 L 617 293 L 524 144 L 365 260 L 206 144 L 113 293 Z"/>
+  <!-- base bar: top edge flush with the leg outer slopes, anchoring the M -->
+  <path fill="#FC8CAC" d="M 53 248 L 677 248 L 705 293 L 25 293 Z"/>
+</svg>

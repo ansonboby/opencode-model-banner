@@ -26,10 +26,11 @@ DeepSeek V4 Flash (tokenrouter)
 - **Live switching** — banner swaps within ~0.5s of a ctrl+x m model switch
 - Works in the terminal **and** the opencode desktop app (both run the same TUI)
 
-Art for 15 brands — 14 generated from official logos ([lobe-icons](https://github.com/lobehub/lobe-icons),
-MIT) plus a hand-authored DeepSeek whale:
-DeepSeek · Z.ai (GLM) · Kimi (Moonshot) · Grok (xAI) · Qwen · MiniMax · OpenAI ·
-Gemini · Claude · Mistral · NVIDIA · StepFun · Tencent · ByteDance · opencode.
+Art for 15 brands — 14 hand-authored brand mascots (wide banner silhouettes,
+rendered as smooth gradient half-blocks) plus the stock opencode mark:
+DeepSeek 🐋whale · Z.ai Z · Kimi ☾crescent · Grok swept-wing · Qwen three rings ·
+MiniMax M · OpenAI hex-knot · Gemini sparkle · Claude sunburst · Mistral pixel-M ·
+NVIDIA eye · StepFun chevrons · Tencent penguin · ByteDance Doubao heart · opencode.
 Unknown models fall back to block-letter art of the model name.
 
 ## Example
@@ -90,10 +91,10 @@ FIGlet-style name art.
 
 ## Regenerating art
 
-Art is machine-generated. `plugin/art.ts` comes from SVG sources — official
-logos from [lobe-icons](https://github.com/lobehub/lobe-icons) for 14 brands,
-and a hand-authored stylized whale (rounded head, arched back, two-fluke tail)
-for DeepSeek:
+Art is machine-generated. `plugin/art.ts` comes from SVG sources —
+hand-authored brand mascots at banner aspect (730×300 silhouettes, drawn
+to read at ~80×17 glyph resolution) in `gen/icons/mascot-*.svg`, plus the
+stock opencode mark:
 
 ```sh
 cd gen && bun install        # resvg for SVG rasterization
@@ -103,9 +104,10 @@ cd .. && python3 bundle.py   # inline art.ts into model-banner.tsx
 cp plugin/model-banner.tsx ~/.config/opencode/plugins/
 ```
 
-To add a brand: drop its SVG in `gen/icons/`, add a gradient pair + stretch
-factor + row budget in `gen/svg2art.mjs`, and a mapping entry in `gen/emit.py`,
-then run the pipeline above.
+To add a brand: author `gen/icons/mascot-<brand>.svg` (viewBox `0 0 730 300`,
+solid-fill silhouette; verify with `bun run dump-mascot.mjs <brand>`),
+add a gradient pair + row budget in `gen/svg2art.mjs`, and a mapping entry in
+`gen/emit.py`, then run the pipeline above.
 
 ### How the art is made
 
@@ -127,12 +129,15 @@ plugin/art.test.ts        matchArt behavior tests (bun test)
 .github/workflows/ci.yml  bundle sync + build + tests
 gen/svg2art.mjs           SVG → gradient half-block converter
 gen/emit.py               converter output → art.ts
-gen/icons/                official brand SVGs (from lobehub/lobe-icons, MIT)
+gen/icons/                hand-authored mascot SVGs (banner-aspect silhouettes)
 media/                    screenshots + demo GIF + ansi2png.py (capture→PNG)
 ```
 
 ## License
 
-MIT. Brand logos are trademarks of their respective owners; the SVG sources
-in `gen/icons/` come from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT)
-and are used here as functional identification of the models they ship.
+MIT. Brand names and mascot shapes are stylized trademarks of their
+respective owners; the original lobe-icons logo SVGs are retained in
+`gen/icons/` for reference and are covered by
+[lobe-icons](https://github.com/lobehub/lobe-icons) (MIT). All `mascot-*.svg`
+files are original hand-authored silhouettes, used here as functional
+identification of the models they depict.
