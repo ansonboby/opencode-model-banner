@@ -30,27 +30,23 @@ Unknown models fall back to block-letter art of the model name.
 
 ## Example
 
-DeepSeek whale on the home screen (truecolor terminal):
+Home screen, one banner per model (live capture, truecolor):
 
-```
-        ▄▄▄▄▄▄▄▄▄▄▄▄██
-   █████████████████████████
-  ████████████████████████▄▄▄▀███
-  ███████████████████████████████▄▄▄▀
- ████████████████████████████████████▄▄▄▄
- ▀▀████████████████████████▄▄▄▀▀▀▀█████████
-    ▀▀▀██████████████▄▄███▀▀█████
-    ▀▀████████████████▄▄▄▄▄▄█████
-      ▀▀███████████████████████
-     ▄▄▄▄▄▄▄▀▀███████████████████
-     ▄██████████▄▄▄▄▀▀▀█████████████
-████████████████████████████▄█▀▀▀▀▀▀▀▀▀▀▀▀
-     ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+| DeepSeek | GLM |
+|:---:|:---:|
+| ![DeepSeek](media/home-deepseek.png) | ![GLM](media/home-glm.png) |
 
-        DeepSeek V4 Flash (tokenrouter)
-```
+| Kimi | Grok |
+|:---:|:---:|
+| ![Kimi](media/home-kimi.png) | ![Grok](media/home-grok.png) |
 
-In sessions, a compact one-line banner above the prompt: `☾ Kimi K2.5`, `◈ GLM 5.3 Free`, `✦ Grok 4.1 Fast`.
+Session view — compact banner above the prompt:
+
+![Session banner](media/session-banner.png)
+
+Banners swap live on model switch (~0.5s after the picker writes the state):
+
+![Model switch demo](media/model-switch.gif)
 
 ## Install
 
@@ -125,6 +121,7 @@ plugin/art.test.ts        matchArt behavior tests (bun test)
 gen/svg2art.mjs           SVG → gradient half-block converter
 gen/emit.py               converter output → art.ts
 gen/icons/                official brand SVGs (from lobehub/lobe-icons, MIT)
+media/                    screenshots + demo GIF + ansi2png.py (capture→PNG)
 ```
 
 ## License
