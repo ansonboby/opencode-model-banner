@@ -63,7 +63,8 @@ function convert(svgFile, key, targetRows) {
   const rendered = r.render()
   const w = rendered.width, h = rendered.height, px = rendered.pixels
   const rows = targetRows
-  const cols = Math.max(2, Math.round((w / h) * rows * 0.5 * (STRETCH[key] ?? 1) * 2))
+  // terminal glyph cell is ~1:2 (w:h); preserve the SVG's visual aspect
+  const cols = Math.max(2, Math.round((w / h) * rows * 2 * (STRETCH[key] ?? 1)))
   // natural alpha grid: colsN x rows*2 sub-cells
   const colsN = Math.max(1, Math.ceil(w / (CELL_W)))
   const grid = []
@@ -112,7 +113,13 @@ function convert(svgFile, key, targetRows) {
     for (let gx = 0; gx < cols; gx++) {
       const cT = covGrid[gy][0][gx], cB = covGrid[gy][1][gx]
       const onT = cT > 0.5, onB = cB > 0.5
-      if (!onT && !onB) continue
+      if (!onT && !onB) {
+        // blank cell: emit a space run so internal gaps (Z cutouts, fluke
+        // notches, ring holes) survive run-length compression and keep ink
+        // at its true column offset
+        segs.push([-1, ' '])
+        continue
+      }
       const t = rows <= 1 ? 0 : gy / (rows - 1)
       let idx = Math.round(t * (PALETTE - 1))
       const edge = onT && onB ? Math.min(cT, cB) : Math.max(cT, cB)
@@ -125,6 +132,8 @@ function convert(svgFile, key, targetRows) {
       if (last && last[0] === s[0]) last[1] += s[1]
       else merged.push(s)
     }
+    // trim only TRAILING blanks; leading blanks carry the first ink's column
+    while (merged.length && merged[merged.length - 1][0] === -1) merged.pop()
     runs.push(merged)
   }
   while (runs.length && runs[0].length === 0) runs.shift()
@@ -134,7 +143,7 @@ function convert(svgFile, key, targetRows) {
 
 // brand -> [svg, glyph row budget]
 const STRETCH = {
-  deepseek: 2.4,   // wide & flat like mockup
+  deepseek: 1.0,   // hand-authored mockup whale already wide
   zai: 1.4,
   kimi: 1.3,
   grok: 1.5,
@@ -151,7 +160,7 @@ const STRETCH = {
 }
 
 const FILES = {
-  deepseek: ['icons/deepseek.svg', 17],
+  deepseek: ['icons/whale-mockup.svg', 17],
   zai: ['icons/zai.svg', 16],
   kimi: ['icons/kimi.svg', 16],
   grok: ['icons/grok.svg', 16],
@@ -174,7 +183,7 @@ for (const [key, [file, rows]] of Object.entries(FILES)) {
   const maxCols = out[key].runs.reduce((m, r) => Math.max(m, r.reduce((a, [, t]) => a + t.length, 0)), 0)
   console.log(key, out[key].runs.length, 'rows', maxCols, 'cols')
 }
-writeFileSync('/tmp/artgen/art.json', JSON.stringify(out))
+writeFileSync(new URL('./art.json', import.meta.url).pathname, JSON.stringify(out))
 
 let prev = ''
 for (const key of Object.keys(out)) {
@@ -183,11 +192,12 @@ for (const key of Object.keys(out)) {
   for (const run of out[key].runs) {
     let line = ''
     for (const [idx, text] of run) {
+      if (idx === -1) { line += text; continue }
       const c = colors[idx]
       line += `\x1b[38;2;${parseInt(c.slice(1,3),16)};${parseInt(c.slice(3,5),16)};${parseInt(c.slice(5,7),16)}m${text}`
     }
     prev += line + '\x1b[0m\n'
   }
 }
-writeFileSync('/tmp/artgen/preview.ans', prev)
+writeFileSync(new URL('./preview.ans', import.meta.url).pathname, prev)
 console.log('wrote art.json + preview.ans')

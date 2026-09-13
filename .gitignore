@@ -2,3 +2,5 @@ gen/node_modules/
 node_modules/
 *.log
 .DS_Store
+gen/node_modules/
+gen/bun.lock
