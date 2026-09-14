@@ -220,7 +220,7 @@ function convert(svgFile, key, targetRows) {
       // diagonal light bias: brighten toward upper-left, darken toward
       // lower-right — but keep the vertical gradient as the anchor tone
       const d = diag(gx, gy)
-      idx = Math.round(idx + (d - 0.5) * 8)
+      idx = Math.round(idx - (d - 0.5) * 8)
       idx = Math.max(0, Math.min(PALETTE16 - 1, idx))
       // author tone: hi lifts toward top of palette, sh drops toward bottom
       const tone = onT && onB ? (cT.tone === cB.tone ? cT.tone : 'base') : (onT ? cT.tone : cB.tone)
