@@ -47,9 +47,14 @@ Home screen, one banner per model (live capture, truecolor):
 |:---:|:---:|
 | ![Kimi](media/home-kimi.png) | ![Grok](media/home-grok.png) |
 
-Session view — compact banner above the prompt:
+Session view — compact banner above the prompt. **While the model runs, the
+banner animates**: a brand-colored wave scrolls next to the model name with a
+`thinking…` tag (`retrying · attempt N…` on retries), then settles back to the
+signature glyph when idle:
 
-![Session banner](media/session-banner.png)
+| Session banner (running) | Session banner (idle) |
+|:---:|:---:|
+| ![Session running](media/session-running.png) | ![Session banner](media/session-banner.png) |
 
 Banners swap live on model switch (~0.5s after the picker writes the state):
 
@@ -84,6 +89,12 @@ The plugin overrides two official TUI plugin slots:
 
 - `home_logo` (replace) — renders the mascot + label above the input box
 - `session_prompt` — wraps the stock prompt with a compact banner
+
+
+Running-state indicator: the plugin subscribes to `session.status` events
+(`idle` | `busy` | `retry`). While busy, the session banner renders a scrolling
+brand-colored wave + `thinking…`; retries show `retrying · attempt N…`. The
+animation timer only runs while a session is active.
 
 Model resolution mirrors opencode's own chain: config `model` →
 `~/.local/state/opencode/model.json` `recent[0]` → first provider default.
